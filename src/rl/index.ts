@@ -69,9 +69,7 @@ export class RocketLeague {
   }
 
   public async getPlayerSkill(auth: EOSAuth, playerId: string) {
-    console.log("[rl] getPlayerSkill");
     if (this.socket === null) {
-      console.log("[rl] needs to activate");
       await this.activate(auth);
     }
 
@@ -103,9 +101,7 @@ export class RocketLeague {
       return this.currentActivationPromise;
 
     this.currentActivationPromise = (async () => {
-      console.log("[activation] about to log in to psynet");
       const psynet = await loginToPsynet(credentials);
-      console.log("[activation] about to create connection", psynet);
       this.socket = new WebSocket(psynet.PerConURLv2, {
         headers: {
           PsyToken: psynet.PsyToken,
@@ -139,8 +135,6 @@ export class RocketLeague {
         this.resetAutoDisconnectTimer(false);
       });
 
-      console.log("[activation] created socket successfully");
-
       await new Promise<void>((resolve) => {
         this.socket!.addEventListener("open", async () => {
           this.resetAutoDisconnectTimer();
@@ -155,7 +149,6 @@ export class RocketLeague {
   }
 
   private deactivate() {
-    console.log("[rl] deactivating");
     this.socket?.close();
     this.socket = null;
   }
