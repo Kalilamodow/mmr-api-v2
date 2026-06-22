@@ -95,7 +95,7 @@ app.get("/get-skills", async (c) => {
 serve(
   {
     fetch: app.fetch,
-    port: PORT,
+    port: Number(process.env.port) || PORT,
   },
   (info) => {
     console.log(`Running on ${info.address}:${info.port}`);
