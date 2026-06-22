@@ -35,7 +35,7 @@ function parseHttpResponse(raw: string) {
   });
 }
 
-type PlayerSkillData = {
+export type PlayerSkillData = {
   Skills: {
     Playlist: number;
     Mu: number;

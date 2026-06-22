@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import * as fs from "node:fs";
 import { bootstrap } from "./bootstrapper.js";
 import { EOSAuth } from "./egs-auth/index.js";
-import { RocketLeague } from "./rl/index.js";
+import { RocketLeague, type PlayerSkillData } from "./rl/index.js";
 
 async function initializeAuth() {
   const auth = new EOSAuth();
@@ -49,14 +49,44 @@ const rocketLeague = new RocketLeague();
 
 const app = new Hono();
 app.get("/bootstrap", () => bootstrap(auth));
-app.get("/skill", async (c) => {
+
+// // legacy
+// app.get("/skills/getPlayerSkill/:playerId", async (c) => {
+//   const playerId = c.req.param("playerId");
+//   try {
+//     const skill = await rocketLeague.getPlayerSkill(auth, playerId);
+//     return c.json({ skill });
+//   } catch (error) {
+//     return c.json({ error: (error as Error).message });
+//   }
+// });
+
+function muToMMR(mu: number) {
+  return Math.ceil(mu * 20 + 100);
+}
+
+// makes it a bit more easy to use
+function skillResponse(skill: PlayerSkillData | null) {
+  if (skill === null) return { playlists: null };
+
+  return {
+    playlists: skill.Skills.map((sk) => ({
+      id: sk.Playlist,
+      mmr: muToMMR(sk.Mu),
+      tier: sk.Tier,
+      division: sk.Division,
+    })),
+  };
+}
+
+app.get("/get-skills", async (c) => {
   const playerId = c.req.query("playerId");
   if (playerId === undefined)
     return c.json({ error: "No player id specified" });
 
   try {
     const skill = await rocketLeague.getPlayerSkill(auth, playerId);
-    return c.json({ skill });
+    return c.json(skillResponse(skill));
   } catch (error) {
     return c.json({ error: (error as Error).message });
   }
