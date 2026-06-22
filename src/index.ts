@@ -1,10 +1,13 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { bootstrap } from "./bootstrapper.js";
+import { EOSAuth } from "./egs-auth/index.js";
 
 const PORT = 3000;
+const currentAuth: EOSAuth = EOSAuth.default();
 
 const app = new Hono();
-app.get("/", (c) => c.text("Hello world!"));
+app.get("/bootstrap", () => bootstrap(currentAuth));
 
 serve(
   {
