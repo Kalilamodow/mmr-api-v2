@@ -36,19 +36,15 @@ export class EOSAuth {
     refreshToken: string;
   } | null;
 
-  private constructor(creds: EOSAuthResponse | null) {
+  private refreshTokenUpdatedHandlers: ((refreshToken: string) => void)[];
+
+  constructor() {
     this.auth = null;
-    if (creds) this.set(creds);
+    this.refreshTokenUpdatedHandlers = [];
   }
 
-  public static default() {
-    return new this(null);
-  }
-
-  public static async withRefresh(token: string) {
-    const auth = new this(null);
-    await auth._refresh(token);
-    return auth;
+  public onRefreshTokenUpdate(fn: (refreshToken: string) => void) {
+    this.refreshTokenUpdatedHandlers.push(fn);
   }
 
   public set(creds: EOSAuthResponse) {
@@ -57,6 +53,9 @@ export class EOSAuth {
       accessToken: creds.access_token,
       refreshToken: creds.refresh_token,
     };
+
+    for (const handler of this.refreshTokenUpdatedHandlers)
+      handler(creds.refresh_token);
   }
 
   public get() {
@@ -68,11 +67,9 @@ export class EOSAuth {
     return this.auth !== null;
   }
 
-  public refresh() {
-    return this._refresh(this.get().refreshToken);
-  }
-
-  private async _refresh(refreshToken: string) {
+  public async refresh(): Promise<void>;
+  public async refresh(refreshToken: string): Promise<void>;
+  public async refresh(refreshToken?: string) {
     const response = await fetch(
       "https://api.epicgames.dev/epic/oauth/v2/token",
       {
@@ -87,13 +84,18 @@ export class EOSAuth {
           deployment_id: DEPLOYMENT_ID,
           scope: "basic_profile",
           grant_type: "refresh_token",
-          refresh_token: refreshToken,
+          refresh_token: refreshToken ?? this.get().refreshToken,
           token_type: "eg1",
         }).toString(),
       },
     );
 
-    const json: EOSAuthResponse = await response.json();
+    const json: EOSAuthResponse & {
+      error?: string;
+      error_description?: string;
+    } = await response.json();
+    if (json.error) throw new Error(json.error_description);
+
     this.set(json);
   }
 }
