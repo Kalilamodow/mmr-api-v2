@@ -43,23 +43,25 @@ async function initializeAuth() {
 
 const CREDENTIAL_FILE = "./saved-credentials.json";
 const PORT = 3000;
+const PASSWORD = (() => {
+  const pw = process.env.PASSWORD;
+  if (!pw)
+    throw new Error(
+      "No password supplied. Set it in the PASSWORD environment variable!",
+    );
+  return pw;
+})();
 
 const auth = await initializeAuth();
 const rocketLeague = new RocketLeague();
 
 const app = new Hono();
-app.get("/bootstrap", () => bootstrap(auth));
-
-// // legacy
-// app.get("/skills/getPlayerSkill/:playerId", async (c) => {
-//   const playerId = c.req.param("playerId");
-//   try {
-//     const skill = await rocketLeague.getPlayerSkill(auth, playerId);
-//     return c.json({ skill });
-//   } catch (error) {
-//     return c.json({ error: (error as Error).message });
-//   }
-// });
+app.get("/bootstrap", (c) => {
+  if (c.req.query("pw") == PASSWORD) {
+    return bootstrap(auth);
+  }
+  return c.json({ error: "wrong password" });
+});
 
 function muToMMR(mu: number) {
   return Math.ceil(mu * 20 + 100);
