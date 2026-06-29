@@ -53,6 +53,8 @@ const auth = await initializeAuth();
 const rocketLeague = new RocketLeague();
 
 const app = new Hono();
+app.get("/", (c) => c.redirect("https://github.com/Kalilamodow/mmr-api-v2"));
+
 app.get("/bootstrap", (c) => {
   if (c.req.query("pw") == password) {
     return bootstrap(auth);
