@@ -8,6 +8,7 @@ import {
   type PlayerProfileResult,
   type PlayerSkillData,
 } from "./rl/index.js";
+import { loadConfig } from "./config.js";
 
 async function initializeAuth() {
   const auth = new EOSAuth();
@@ -46,22 +47,14 @@ async function initializeAuth() {
 }
 
 const CREDENTIAL_FILE = "./saved-credentials.json";
-const PORT = 3000;
-const PASSWORD = (() => {
-  const pw = process.env.PASSWORD;
-  if (!pw)
-    throw new Error(
-      "No password supplied. Set it in the PASSWORD environment variable!",
-    );
-  return pw;
-})();
+const { port, password } = loadConfig();
 
 const auth = await initializeAuth();
 const rocketLeague = new RocketLeague();
 
 const app = new Hono();
 app.get("/bootstrap", (c) => {
-  if (c.req.query("pw") == PASSWORD) {
+  if (c.req.query("pw") == password) {
     return bootstrap(auth);
   }
   return c.json({ error: "wrong password" });
@@ -125,7 +118,7 @@ app.get("/get-profile", async (c) => {
 serve(
   {
     fetch: app.fetch,
-    port: Number(process.env.port) || PORT,
+    port: port,
   },
   (info) => {
     console.log(`Running on ${info.address}:${info.port}`);
