@@ -3,7 +3,11 @@ import { Hono } from "hono";
 import * as fs from "node:fs";
 import { bootstrap } from "./bootstrapper.js";
 import { EOSAuth } from "./egs-auth/index.js";
-import { RocketLeague, type PlayerSkillData } from "./rl/index.js";
+import {
+  RocketLeague,
+  type PlayerProfileResult,
+  type PlayerSkillData,
+} from "./rl/index.js";
 
 async function initializeAuth() {
   const auth = new EOSAuth();
@@ -89,6 +93,30 @@ app.get("/get-skills", async (c) => {
   try {
     const skill = await rocketLeague.getPlayerSkill(auth, playerId);
     return c.json(skillResponse(skill));
+  } catch (error) {
+    return c.json({ error: (error as Error).message });
+  }
+});
+
+function profileResponse(profile: PlayerProfileResult | null) {
+  if (profile === null) return null;
+
+  const player = profile.PlayerData[0];
+  return {
+    id: player.PlayerID,
+    name: player.PlayerName,
+    state: player.PresenceState,
+  };
+}
+
+app.get("/get-profile", async (c) => {
+  const playerId = c.req.query("playerId");
+  if (playerId === undefined)
+    return c.json({ error: "No player id specified" });
+
+  try {
+    const profile = await rocketLeague.getPlayerProfile(auth, playerId);
+    return c.json(profileResponse(profile));
   } catch (error) {
     return c.json({ error: (error as Error).message });
   }

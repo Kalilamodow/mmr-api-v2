@@ -52,14 +52,24 @@ export type PlayerSkillData = {
   };
 };
 
+export type PlayerProfileResult = {
+  PlayerData: {
+    PlayerID: string;
+    PlayerName: string;
+    PresenceState: string;
+    PresenceInfo: string;
+  }[];
+};
+
 export class RocketLeague {
   private socket: WebSocket | null;
   private autoDisconnectTimeout: TimeoutId | null;
+  private requestId: number;
+
   private handlers: {
     requestId: number;
-    handler: (data: PlayerSkillData | null) => void;
+    handler: (data: any) => void;
   }[];
-  private requestId: number;
 
   constructor() {
     this.socket = null;
@@ -69,23 +79,40 @@ export class RocketLeague {
   }
 
   public async getPlayerSkill(auth: EOSAuth, playerId: string) {
+    return this.send<PlayerSkillData>(
+      auth,
+      "Skills/GetPlayerSkill v1",
+      JSON.stringify({
+        PlayerID: playerId,
+      }),
+    );
+  }
+
+  public async getPlayerProfile(auth: EOSAuth, playerId: string) {
+    return this.send<PlayerProfileResult>(
+      auth,
+      "Players/GetProfile v1",
+      JSON.stringify({
+        PlayerIDs: [playerId],
+      }),
+    );
+  }
+
+  private async send<T>(auth: EOSAuth, service: string, body: string) {
     if (this.socket === null) {
       await this.activate(auth);
     }
 
     this.requestId++;
 
-    const body = JSON.stringify({
-      PlayerID: playerId,
-    });
     const headers = [
-      "PsyService: Skills/GetPlayerSkill v1",
+      `PsyService: ${service}`,
       `PsyRequestID: PsyNetMessage_X_${this.requestId}`,
       `PsySig: ${generatePsySig(body)}`,
     ].join("\r\n");
 
     this.socket!.send(`${headers}\r\n\r\n${body}`);
-    return new Promise<PlayerSkillData | null>((resolve, reject) => {
+    return new Promise<T | null>((resolve, reject) => {
       this.handlers.push({
         requestId: this.requestId,
         handler: resolve,
@@ -116,7 +143,7 @@ export class RocketLeague {
         this.resetAutoDisconnectTimer();
 
         const requestId = Number(resp.headers.get("PsyResponseID")!.slice(16));
-        resp.json().then((json: { Result: PlayerSkillData }) => {
+        resp.json().then((json: any) => {
           for (const handler of this.handlers) {
             if (handler.requestId === requestId)
               handler.handler(json.Result || null);
