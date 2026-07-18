@@ -65,22 +65,24 @@ export class RocketLeague {
   private socket: WebSocket | null;
   private autoDisconnectTimeout: TimeoutId | null;
   private requestId: number;
+  private auth: EOSAuth;
 
   private handlers: {
     requestId: number;
     handler: (data: any) => void;
   }[];
 
-  constructor() {
+  constructor(auth: EOSAuth) {
     this.socket = null;
+    this.auth = auth;
     this.autoDisconnectTimeout = null;
     this.handlers = [];
     this.requestId = 1;
   }
 
-  public async getPlayerSkill(auth: EOSAuth, playerId: string) {
+  public async getPlayerSkill(playerId: string) {
     return this.send<PlayerSkillData>(
-      auth,
+      this.auth,
       "Skills/GetPlayerSkill v1",
       JSON.stringify({
         PlayerID: playerId,
@@ -88,9 +90,9 @@ export class RocketLeague {
     );
   }
 
-  public async getPlayerProfile(auth: EOSAuth, playerId: string) {
+  public async getPlayerProfile(playerId: string) {
     return this.send<PlayerProfileResult>(
-      auth,
+      this.auth,
       "Players/GetProfile v1",
       JSON.stringify({
         PlayerIDs: [playerId],

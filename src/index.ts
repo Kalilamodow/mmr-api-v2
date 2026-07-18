@@ -50,7 +50,7 @@ const CREDENTIAL_FILE = "./saved-credentials.json";
 const { port, password } = loadConfig();
 
 const auth = await initializeAuth();
-const rocketLeague = new RocketLeague();
+const rocketLeague = new RocketLeague(auth);
 
 const app = new Hono();
 app.get("/", (c) => c.redirect("https://github.com/Kalilamodow/mmr-api-v2"));
@@ -86,7 +86,7 @@ app.get("/get-skills", async (c) => {
     return c.json({ error: "No player id specified" });
 
   try {
-    const skill = await rocketLeague.getPlayerSkill(auth, playerId);
+    const skill = await rocketLeague.getPlayerSkill(playerId);
     return c.json(skillResponse(skill));
   } catch (error) {
     return c.json({ error: (error as Error).message });
@@ -110,7 +110,7 @@ app.get("/get-profile", async (c) => {
     return c.json({ error: "No player id specified" });
 
   try {
-    const profile = await rocketLeague.getPlayerProfile(auth, playerId);
+    const profile = await rocketLeague.getPlayerProfile(playerId);
     return c.json(profileResponse(profile));
   } catch (error) {
     return c.json({ error: (error as Error).message });
