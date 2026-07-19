@@ -61,6 +61,23 @@ export type PlayerProfileResult = {
   }[];
 };
 
+export type ClubDetailsResult = {
+  ClubDetails: {
+    ClubID: number;
+    ClubName: string;
+    ClubTag: string;
+    EquippedTitle: string;
+    OwnerPlayerID: string;
+    Members: {
+      PlayerID: string;
+      PlayerName: string;
+      EpicPlayerID: string;
+      EpicPlayerName: string;
+      RoleID: number;
+    }[];
+  };
+};
+
 export class RocketLeague {
   private socket: WebSocket | null;
   private autoDisconnectTimeout: TimeoutId | null;
@@ -96,6 +113,16 @@ export class RocketLeague {
       "Players/GetProfile v1",
       JSON.stringify({
         PlayerIDs: [playerId],
+      }),
+    );
+  }
+
+  public async getPlayerClubDetails(playerId: string) {
+    return this.send<ClubDetailsResult>(
+      this.auth,
+      "Clubs/GetPlayerClubDetails v2",
+      JSON.stringify({
+        PlayerID: playerId,
       }),
     );
   }

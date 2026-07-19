@@ -117,6 +117,31 @@ app.get("/get-profile", async (c) => {
   }
 });
 
+app.get("/player-id-to-epic-name", async (c) => {
+  const playerId = c.req.query("playerId");
+  if (playerId === undefined)
+    return c.json({ error: "No player id specified" });
+
+  try {
+    const club = await rocketLeague.getPlayerClubDetails(playerId);
+    if (club === null) return c.json({ name: null });
+    if (club.ClubDetails === undefined) return c.json({ name: null });
+
+    const foundPlayer = club.ClubDetails.Members.find(
+      (m) => m.PlayerID === playerId,
+    );
+    if (foundPlayer === undefined) {
+      throw new Error(
+        "player is not part of their own club. " + JSON.stringify(club),
+      );
+    }
+
+    return c.json({ name: foundPlayer.EpicPlayerName });
+  } catch (error) {
+    return c.json({ error: (error as Error).message });
+  }
+});
+
 serve(
   {
     fetch: app.fetch,

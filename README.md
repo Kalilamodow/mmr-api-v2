@@ -1,7 +1,7 @@
 # mmr-api-v2
 
 This is an api that talks to Rocket League's own websocket API to provide an
-http interface for skill data (mmrs, ranks) and profile data (kind of useless).
+http interface for skill data (mmrs, ranks) and profile data.
 
 It is written in javascript with Node to be used as a webserver.
 
@@ -67,5 +67,20 @@ example: `https://mmr.kmdw.dev/get-profile?playerId=Steam|76561198144145654|0`
   "id": "Steam|76561198144145654|0",
   "name": "zen",
   "state": "Offline"
+}
+```
+
+### `/player-id-to-epic-name`
+
+Converts a normal player id to the player's connected Epic account name
+
+This only works if the player is in a club because it uses club details
+
+example: `https://mmr.kmdw.dev/get?playerId=XboxOne|2535426630902234|0` -> name: DefNotHackingFr
+but `https://mmr.kmdw.dev/player-id-to-epic-name?playerId=XboxOne|2535426630902234|0` gives
+
+```json
+{
+  "name": "j0hnd00d1e12344_"
 }
 ```
