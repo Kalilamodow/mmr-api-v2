@@ -43,7 +43,10 @@ async function initializeAuth() {
 
   setInterval(
     () => {
-      if (auth.exists()) auth.refresh();
+      if (auth.exists()) {
+        logger.log("authentication", "Automatic authentication refresh");
+        auth.refresh();
+      }
     },
     60 * 60 * 1000,
   );
@@ -100,6 +103,7 @@ app.get("/webadmin/api/currentauth", (c) => {
 });
 
 app.get("/webadmin/api/refreshAuth", async (c) => {
+  logger.log("admin api", "Manual authentication refresh requested");
   await auth.refresh();
   return c.text("");
 });

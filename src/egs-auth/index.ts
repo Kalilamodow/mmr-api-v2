@@ -1,3 +1,5 @@
+import logger from "../session-logger.js";
+
 const EOS_CLIENT_ID = "xyza7891p5D7s9R6Gm6moTHWGloerp7B";
 const EOS_CLIENT_SEC = "Knh18du4NVlFs+3uQ+ZPpDCVto0WYf4yXP8+OcwVt1o";
 const DEPLOYMENT_ID = "da32ae9c12ae40e8a112c52e1f17f3ba";
@@ -95,6 +97,8 @@ export class EOSAuth {
       error_description?: string;
     } = await response.json();
     if (json.error) throw new Error(json.error_description);
+
+    logger.log("EOSAuth", "Refreshed authentication");
 
     this.set(json);
   }
