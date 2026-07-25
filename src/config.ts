@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import path from "node:path";
 
 type Configuration = {
   password: string;
@@ -15,7 +16,7 @@ const getOrThrow = (obj: any, key: string) => {
 };
 
 export function loadConfig(): Configuration {
-  const configPath = "./config.json";
+  const configPath = path.join(process.cwd(), "./config.json");
   if (!fs.existsSync(configPath)) {
     throw new Error("couldnt find config file");
   }

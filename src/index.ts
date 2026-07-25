@@ -1,14 +1,15 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import * as fs from "node:fs";
+import path from "node:path";
 import { bootstrap } from "./bootstrapper.js";
+import { loadConfig } from "./config.js";
 import { EOSAuth } from "./egs-auth/index.js";
 import {
   RocketLeague,
   type PlayerProfileResult,
   type PlayerSkillData,
 } from "./rl/index.js";
-import { loadConfig } from "./config.js";
 
 async function initializeAuth() {
   const auth = new EOSAuth();
@@ -46,7 +47,7 @@ async function initializeAuth() {
   return auth;
 }
 
-const CREDENTIAL_FILE = "./saved-credentials.json";
+const CREDENTIAL_FILE = path.join(process.cwd(), "./saved-credentials.json");
 const { port, password } = loadConfig();
 
 const auth = await initializeAuth();
