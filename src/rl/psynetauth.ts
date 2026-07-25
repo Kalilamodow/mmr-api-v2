@@ -47,6 +47,19 @@ export async function loginToPsynet(auth: EOSAuth): Promise<PsynetAuth> {
     },
   );
 
-  const json: { Result: PsynetAuth } = await response.json();
-  return json.Result;
+  const json:
+    { Result: PsynetAuth } | { Error: { Type: string; Message: string } } =
+    await response.json();
+
+  if ("Result" in json) {
+    return json.Result;
+  }
+
+  if (json.Error.Type === "ThirdPartyError") {
+    console.warn("got third party error. refreshing.");
+    auth.refresh();
+    return loginToPsynet(auth);
+  }
+
+  throw new Error("psynet error:" + JSON.stringify(json));
 }
