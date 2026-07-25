@@ -10,7 +10,11 @@ import {
   type PlayerProfileResult,
   type PlayerSkillData,
 } from "./rl/index.js";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { fileURLToPath } from "node:url";
+import { createMiddleware } from "hono/factory";
 
+const refreshes: number[] = [];
 async function initializeAuth() {
   const auth = new EOSAuth();
 
@@ -24,6 +28,7 @@ async function initializeAuth() {
         encoding: "utf-8",
       },
     );
+    refreshes.push(Date.now());
   });
 
   if (fs.existsSync(CREDENTIAL_FILE)) {
@@ -60,11 +65,52 @@ app.get("/", (c) =>
   ),
 );
 
-app.get("/bootstrap", (c) => {
-  if (c.req.query("pw") == password) {
-    return bootstrap(auth);
+app.get(
+  "/webadmin/*",
+  serveStatic({ root: fileURLToPath(new URL("./", import.meta.url)) }),
+);
+
+app.use(
+  "/webadmin/api/*",
+  createMiddleware(async (c, next) => {
+    if (c.req.query("pw") != password) {
+      c.status(403);
+      return c.text("forbidden");
+    }
+
+    await next();
+    return;
+  }),
+);
+
+app.get("/webadmin/api/stats", (c) => {
+  return c.json({
+    bootstrapped: auth.exists(),
+  });
+});
+
+app.get("/webadmin/api/currentauth", (c) => {
+  if (!auth.exists()) {
+    return c.json({ auth: null });
   }
-  return c.json({ error: "wrong password" });
+
+  const current = auth.get();
+  return c.json({
+    auth: current,
+  });
+});
+
+app.get("/webadmin/api/refreshAuth", async (c) => {
+  await auth.refresh();
+  return c.text("");
+});
+
+app.get("/webadmin/api/bootstrap", (c) => {
+  return bootstrap(auth);
+});
+
+app.get("/webadmin/api/refreshes", (c) => {
+  return c.json({ refreshes });
 });
 
 function muToMMR(mu: number) {

@@ -1,0 +1,28 @@
+:root {
+  font-family: sans-serif;
+}
+
+#app-error {
+  color: red;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+div.app-cell {
+  background-color: #eef;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  padding: 8px;
+  border: 1px solid black;
+  text-wrap: wrap;
+  word-break: break-all;
+}

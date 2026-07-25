@@ -13,7 +13,7 @@ export function bootstrap(auth: EOSAuth): Response {
   const stream = new ReadableStream({
     async start(controller) {
       const push = (text: string) =>
-        controller.enqueue(encoder.encode(`${text}\n\n`));
+        controller.enqueue(encoder.encode(`event: message\ndata: ${text}\n\n`));
 
       const { code, url } = await getDeviceCode();
       push(`Go to "${url}" to verify.`);
@@ -27,7 +27,7 @@ export function bootstrap(auth: EOSAuth): Response {
           auth.set(result.data);
           controller.close();
         } else {
-          push(`Message: "${result.error}"`);
+          push(`${result.error}`);
         }
       }
 
