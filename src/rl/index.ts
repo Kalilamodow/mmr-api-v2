@@ -3,6 +3,7 @@ import type { EOSAuth } from "../egs-auth/index.js";
 import { BUILD_ID } from "./constants.js";
 import { loginToPsynet } from "./psynetauth.js";
 import { generatePsySig } from "./psysig.js";
+import logger from "../session-logger.js";
 
 type TimeoutId = ReturnType<typeof setTimeout>;
 function parseHttpResponse(raw: string) {
@@ -184,7 +185,7 @@ export class RocketLeague {
       });
 
       this.socket.on("error", (err) => {
-        console.error(err);
+        logger.log("RocketLeague.activate", JSON.stringify(err), "error");
       });
 
       this.socket.on("close", () => {

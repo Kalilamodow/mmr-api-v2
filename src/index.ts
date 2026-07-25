@@ -1,7 +1,10 @@
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
+import { createMiddleware } from "hono/factory";
 import * as fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { bootstrap } from "./bootstrapper.js";
 import { loadConfig } from "./config.js";
 import { EOSAuth } from "./egs-auth/index.js";
@@ -10,11 +13,8 @@ import {
   type PlayerProfileResult,
   type PlayerSkillData,
 } from "./rl/index.js";
-import { serveStatic } from "@hono/node-server/serve-static";
-import { fileURLToPath } from "node:url";
-import { createMiddleware } from "hono/factory";
+import logger from "./session-logger.js";
 
-const refreshes: number[] = [];
 async function initializeAuth() {
   const auth = new EOSAuth();
 
@@ -28,18 +28,17 @@ async function initializeAuth() {
         encoding: "utf-8",
       },
     );
-    refreshes.push(Date.now());
   });
 
   if (fs.existsSync(CREDENTIAL_FILE)) {
-    console.log("Using refresh token from credential file");
+    logger.log("initializeAuth", "Using refresh token from credential file");
     const current = fs.readFileSync(CREDENTIAL_FILE, { encoding: "utf-8" });
     const json = JSON.parse(current);
     if (typeof json.refreshToken === "string") {
       await auth.refresh(json.refreshToken);
     }
   } else {
-    console.log("Auth bootstrap required");
+    logger.log("initializeAuth", "Auth bootstrap required");
   }
 
   setInterval(
@@ -109,8 +108,8 @@ app.get("/webadmin/api/bootstrap", (c) => {
   return bootstrap(auth);
 });
 
-app.get("/webadmin/api/refreshes", (c) => {
-  return c.json({ refreshes });
+app.get("/webadmin/api/logs", (c) => {
+  return c.json({ logs: logger.getLogs() });
 });
 
 function muToMMR(mu: number) {

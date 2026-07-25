@@ -97,21 +97,25 @@ async function loadCurrentAuth() {
     });
 }
 
-async function loadRefreshes() {
-  const response = await fetch(withPassword("./api/refreshes"));
+async function loadLogs() {
+  const response = await fetch(withPassword("./api/logs"));
   if (response.status === 403) {
     setGlobalError("Wrong password");
     return;
   }
 
   const json = await response.json();
-  console.log(json);
-  const dates = json.refreshes.map((t) => new Date(t));
-
-  document.getElementById("refreshes-content").replaceChildren(
+  document.getElementById("logs-content").replaceChildren(
     createTable(
-      ["Date"],
-      dates.map((d) => [d.toLocaleString()]),
+      ["Type", "At", "Service", "Message"],
+      json.logs
+        .toReversed()
+        .map((log) => [
+          log.type,
+          new Date(log.time).toLocaleString(),
+          log.from,
+          log.text,
+        ]),
     ),
   );
 }
@@ -124,7 +128,7 @@ async function main() {
   }
 
   loadCurrentAuth();
-  loadRefreshes();
+  loadLogs();
 
   const status = await reloadStatus();
   if (!status.bootstrapped) {

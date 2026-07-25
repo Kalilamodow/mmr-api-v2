@@ -1,4 +1,5 @@
 import type { EOSAuth } from "../egs-auth/index.js";
+import logger from "../session-logger.js";
 import * as c from "./constants.js";
 import { generatePsySig } from "./psysig.js";
 
@@ -56,10 +57,11 @@ export async function loginToPsynet(auth: EOSAuth): Promise<PsynetAuth> {
   }
 
   if (json.Error.Type === "ThirdPartyError") {
-    console.warn("got third party error. refreshing.");
+    logger.log("loginToPsynet", "got third party error. refreshing.", "warn");
     auth.refresh();
     return loginToPsynet(auth);
   }
 
+  logger.log("loginToPsynet", "psynet error:" + JSON.stringify(json), "error");
   throw new Error("psynet error:" + JSON.stringify(json));
 }
