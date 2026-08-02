@@ -3,7 +3,7 @@ import { derived, writable, get } from "svelte/store";
 let password = "";
 const passwordHeader = () => `Basic ${btoa(`:${password}`)}`;
 
-const fetchWithPassword: typeof fetch = (input, init) =>
+export const fetchWithPassword: typeof fetch = (input, init) =>
   fetch(input, {
     ...init,
     headers: { Authorization: passwordHeader(), ...init?.headers },

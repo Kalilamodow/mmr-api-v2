@@ -19,6 +19,7 @@
     background-color: #eeeeef;
     border-radius: 8px;
     padding: 16px;
+    margin-bottom: 12px;
   }
 
   .app-cell h3 {
