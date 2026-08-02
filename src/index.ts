@@ -75,10 +75,12 @@ app.get(
   }),
 );
 
+const passwordHeaderCheck = `Basic ${btoa(`:${password}`)}`;
+
 app.use(
   "/webadmin/api/*",
   createMiddleware(async (c, next) => {
-    if (c.req.query("pw") != password) {
+    if (c.req.header("Authorization") != passwordHeaderCheck) {
       c.status(403);
       return c.text("forbidden");
     }
