@@ -69,7 +69,10 @@ app.get("/", (c) =>
 
 app.get(
   "/webadmin/*",
-  serveStatic({ root: fileURLToPath(new URL("./", import.meta.url)) }),
+  serveStatic({
+    root: fileURLToPath(new URL("./", import.meta.url)),
+    rewriteRequestPath: (p) => p.replace("/webadmin/", "/webadmin/dist/"),
+  }),
 );
 
 app.use(

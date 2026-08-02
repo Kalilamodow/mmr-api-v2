@@ -2,40 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mmr-api-v2 admin</title>
-    <link rel="stylesheet" href="./style.css" />
-    <script src="admin.js"></script>
+    <title>mmr api v2</title>
   </head>
   <body>
-    <h1>mmr-api-v2 admin</h1>
-    <div id="app-error" hidden></div>
-    <div class="app-cell">
-      <h3>General</h3>
-      <div id="status-cell-content"></div>
-    </div>
-    <div class="app-cell">
-      <h3>Bootstrapper</h3>
-      <div id="already-bootstrapped-text">
-        <p>Already bootstrapped :)</p>
-      </div>
-      <div id="bootstrapper-content" hidden>
-        <textarea id="bootstrapper-logs" rows="30" cols="50"></textarea>
-        <br /><br />
-        <button id="bootstrap-button">Start bootstrapping</button>
-      </div>
-    </div>
-    <div class="app-cell">
-      <h3>Current auth</h3>
-      <div id="current-auth-content"></div>
-      <br />
-      <button id="current-auth-refresh-button">
-        refresh (<code>auth.refresh()</code>, then page refresh)
-      </button>
-    </div>
-    <div class="app-cell">
-      <h3>Logs</h3>
-      <div id="logs-content"></div>
-    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

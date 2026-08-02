@@ -5,11 +5,15 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "build": "tsc && cpx \"src/webadmin/**/*\" dist/webadmin"
+    "web-dev": "bun vite build --watch",
+    "build": "tsc && bun vite build && cpx \"src/webadmin/dist/**/*\" dist/webadmin/dist"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.5",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "hono": "^4.12.26",
+    "svelte": "^5.56.8",
+    "vite": "^8.2.0",
     "ws": "^8.21.0"
   },
   "devDependencies": {
