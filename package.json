@@ -11,6 +11,7 @@
   "dependencies": {
     "@hono/node-server": "^2.0.5",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "eventsource": "^4.1.0",
     "hono": "^4.12.26",
     "svelte": "^5.56.8",
     "vite": "^8.2.0",

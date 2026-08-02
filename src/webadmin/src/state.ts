@@ -1,4 +1,5 @@
 import { derived, writable, get } from "svelte/store";
+import { EventSource } from "eventsource";
 
 let password = "";
 const passwordHeader = () => `Basic ${btoa(`:${password}`)}`;
@@ -8,6 +9,11 @@ export const fetchWithPassword: typeof fetch = (input, init) =>
     ...init,
     headers: { Authorization: passwordHeader(), ...init?.headers },
   });
+
+export const eventSourceWithPassword: (
+  ...args: ConstructorParameters<typeof EventSource>
+) => EventSource = (url, eventSourceInitDict) =>
+  new EventSource(url, { ...eventSourceInitDict, fetch: fetchWithPassword });
 
 type ApiStats = {
   bootstrapped: boolean;
