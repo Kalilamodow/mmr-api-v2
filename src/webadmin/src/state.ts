@@ -21,5 +21,6 @@ export async function loadStats(testPassword: string) {
     return;
   }
 
+  localStorage.setItem("mmr-api-v2__saved-password", password);
   apiStats.set(await response.json());
 }
