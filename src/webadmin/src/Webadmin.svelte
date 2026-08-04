@@ -1,6 +1,7 @@
 <script lang="ts">
   import Bootstrapper from "./components/Bootstrapper.svelte";
   import CurrentAuth from "./components/CurrentAuth.svelte";
+  import Logs from "./components/Logs.svelte";
   import Stats from "./components/Stats.svelte";
 </script>
 
@@ -9,3 +10,4 @@
 <Stats />
 <CurrentAuth />
 <Bootstrapper />
+<Logs />
