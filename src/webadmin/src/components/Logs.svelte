@@ -14,7 +14,7 @@
 
   async function load() {
     const response = await fetchWithPassword("./api/logs");
-    logs = (await response.json()).logs;
+    logs = (await response.json()).logs.toReversed();
     for (const log of logs!) {
       logCategories[log.from] = true;
     }
